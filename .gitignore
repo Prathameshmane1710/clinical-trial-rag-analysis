@@ -1,0 +1,8 @@
+.env
+__pycache__/
+*.pyc
+embeddings/
+data/trials_raw.json
+data/last_update.json
+venv/
+.streamlit/
