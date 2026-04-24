@@ -24,7 +24,7 @@ def retrieve_trials(patient_query, n_results=5, filters=None):
     # Step 2 -: Build the search parameters
     search_params = {
         "query_embeddings": [query_embedding],
-        "n_results": n_results,
+        "n_results": n_results*4,
         # documents = the original text we embedded
         # metadatas = nct_id, title, location etc.
         # distances = cosine distance scores
@@ -55,6 +55,8 @@ def retrieve_trials(patient_query, n_results=5, filters=None):
     
     formatted_results = []
     SIMILARITY_THRESHOLD = 0.75 
+    seen_nct_ids = set()
+
     
     for i in range(len(results["metadatas"][0])):
         
@@ -69,6 +71,16 @@ def retrieve_trials(patient_query, n_results=5, filters=None):
         
         if similarity_score < SIMILARITY_THRESHOLD * 100:
             continue
+
+        nct_id = metadata["nct_id"]
+        
+        # Skip if we already have this trial
+        # from a different chunk
+        if nct_id in seen_nct_ids:
+            continue
+        
+        # Mark this trial as seen
+        seen_nct_ids.add(nct_id)
         
         formatted_results.append({
             "nct_id": metadata["nct_id"],
@@ -82,6 +94,10 @@ def retrieve_trials(patient_query, n_results=5, filters=None):
             "eligibility": metadata["eligibility"],
             "similarity_score": similarity_score
         })
+
+        # Stop once we have enough unique trials
+        if len(formatted_results) >= n_results:
+            break
     
     return formatted_results
 

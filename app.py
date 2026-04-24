@@ -139,7 +139,7 @@ with col2:
     st.markdown("**Model:**")
     st.markdown("`llama-3.3-70b`")
     st.markdown("**Database:**")
-    st.markdown(f"`{str(collection.count())}-Multiple Condition trials`")
+    st.markdown(f"`10,000+ Multiple Condition trials`")
     st.markdown("**Embeddings:**")
     st.markdown("`BiomedBERT`")
 
@@ -182,10 +182,12 @@ def is_valid_medical_query(query):
                     "role": "system",
                     "content": """You are a medical query validator.
                                 Answer ONLY with 'YES' or 'NO'.
-                                YES = input describes a medical condition,
-                                symptoms, medications, or health status
-                                NO  = input is gibberish, non-medical,
-                                or too vague to match clinical trials"""
+                                YES = input contains SPECIFIC medical information:
+                                diagnosed condition, medications, lab values,
+                                or detailed symptoms with context
+                                NO  = vague symptoms alone (tired, headache),
+                                gibberish, non-medical content,
+                                or insufficient detail for trial matching"""
                 },
                 {
                     "role": "user",
@@ -351,7 +353,7 @@ with st.sidebar:
     
     st.markdown("---")
     st.header("📊 Database Info")
-    st.metric("Total Trials", str(collection.count()))
+    st.metric("Total Trials", "10,000+")
     st.metric("Condition", "Multiple conditions")
     st.metric("Status", "Recruiting Only")
     st.metric("Source", "ClinicalTrials.gov")

@@ -3,6 +3,7 @@ import os
 from sentence_transformers import SentenceTransformer
 import chromadb
 from chromadb.config import Settings
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 def load_model():
 
@@ -39,6 +40,58 @@ def setup_chromadb(persist_path="embeddings/chroma_db"):
     print("ChromaDB ready!")
     return client, collection
 
+
+def chunk_trial(trial, chunk_size=400, chunk_overlap=50):
+    """
+    Splits trial text into multiple chunks
+    each within BiomedBERT's 512 token limit
+    
+    chunk_size=400 words ≈ 380-400 tokens
+    stays safely under 512 limit
+    
+    chunk_overlap=50 words overlap between chunks
+    Why overlap? So context isn't lost at boundaries
+    Example without overlap:
+    Chunk 1 ends: "...age must be between"
+    Chunk 2 starts: "18 and 65 years old..."
+    → split breaks the criterion ❌
+    
+    With overlap:
+    Chunk 1 ends: "...age must be between 18"
+    Chunk 2 starts: "...must be between 18 and 65..."
+    → criterion preserved in both chunks ✅
+    """
+    
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=chunk_size,
+        chunk_overlap=chunk_overlap,
+        length_function=len,
+        separators=["\n\n", "\n", ".", " "]
+    )
+    
+    # Split the eligibility text specifically
+    # not the whole text_to_embed
+    # Why? Title and condition are short
+    # Only eligibility needs splitting
+    eligibility = trial["eligibility"]
+    chunks = splitter.split_text(eligibility)
+    
+    # Create one document per chunk
+    # each with the title+condition prefix
+    # so every chunk has full context
+    chunked_trials = []
+    for idx, chunk in enumerate(chunks):
+        chunked_trials.append({
+            **trial,  # copy all fields
+            "chunk_index": idx,
+            "chunk_id": f"{trial['nct_id']}_chunk_{idx}",
+            "text_to_embed": f"Title: {trial['title']}. "
+                           f"Condition: {trial['condition']}. "
+                           f"Eligibility: {chunk}"
+        })
+    
+    return chunked_trials
+
 def embed_and_store(trials, collection, model, batch_size=32):
     
     print(f"Starting embedding of {len(trials)} trials...")
@@ -65,7 +118,7 @@ def embed_and_store(trials, collection, model, batch_size=32):
         # Format: NCT04123456_chunk_0
         # this format so we can find and delete
         # all chunks of a trial by filtering on nct_id
-        ids = [f"{trial['nct_id']}_chunk_0" for trial in batch]
+        ids = [trial["chunk_id"] for trial in batch]
         
         # Extract metadata for each trial
         # This gets stored alongside the vector in ChromaDB
@@ -75,6 +128,7 @@ def embed_and_store(trials, collection, model, batch_size=32):
         metadatas = [
             {
                 "nct_id": trial["nct_id"],
+                "chunk_index": trial["chunk_index"],
                 "title": trial["title"],
                 "status": trial["status"],
                 "condition": trial["condition"],
@@ -140,6 +194,16 @@ def main():
     with open("data/trials_parsed.json", "r", encoding="utf-8") as f:
         trials = json.load(f)
     print(f"Loaded {len(trials)} trials")
+
+    # NEW — chunk trials before embedding
+    print("Chunking trials...")
+    all_chunks = []
+    for trial in trials:
+        chunks = chunk_trial(trial)
+        all_chunks.extend(chunks)
+    
+    print(f"Total chunks created: {len(all_chunks)}")
+    print(f"Average chunks per trial: {len(all_chunks)/len(trials):.1f}")
     
     # Step 2 -: Load BiomedBERT
     model = load_model()
@@ -148,12 +212,9 @@ def main():
     client, collection = setup_chromadb()
     
     # Step 4 -: Embed and store everything
-    embed_and_store(trials, collection, model)
+    embed_and_store(all_chunks, collection, model)
     
-    print("\nPhase 3 complete!")
-    print("Your vector database is ready at embeddings/chroma_db/")
-    print("Next step: Phase 4 — build the retriever")
-
+    print("vector database is ready at embeddings/chroma_db/")
 
 if __name__ == "__main__":
     main()
