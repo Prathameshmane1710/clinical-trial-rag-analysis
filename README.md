@@ -23,17 +23,17 @@ by understanding medical meaning, not just keywords.
 
 ## 🏗️ Architecture
 Patient Query (plain English)
-↓
+→
 LLM Query Validation (Llama 3.1 8B)
-↓
+→
 BiomedBERT Embedding (768 dimensions)
-↓
+→
 ChromaDB Semantic Search (cosine similarity)
-↓
+→
 Top 5 Matching Trials Retrieved
-↓
+→
 Llama 3.3 70B Reasoning (Groq)
-↓
+→
 Structured Match Analysis
 ✅ Why you qualify
 ⚠️  What might disqualify you
@@ -103,6 +103,7 @@ streamlit run app.py
 ```
 
 ## 📁 Project Structure
+```text
 clinical-trial-matcher/
 ├── src/
 │   ├── downloader.py   # Fetches trials from ClinicalTrials.gov
@@ -121,7 +122,7 @@ clinical-trial-matcher/
 ├── app.py              # Streamlit web UI
 ├── requirements.txt
 └── README.md
-
+```
 ## 🔄 Daily Update Pipeline
 
 The system automatically stays current via GitHub Actions:
