@@ -57,7 +57,7 @@ Structured Match Analysis
 ## 📊 Dataset
 
 - **Source:** ClinicalTrials.gov (US National Library of Medicine)
-- **Current size:** 1,497 trials (actively growing via daily updates)
+- **Current size:** 10,000+ trials (actively growing via daily updates)
 - **Designed for:** 400k+ trials at full scale
 - **Update frequency:** Daily at 2 AM UTC via GitHub Actions
 - **Status filter:** Recruiting trials only
