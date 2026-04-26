@@ -14,12 +14,12 @@ by understanding medical meaning, not just keywords.
 
 ## What Makes It Unique
 
-- **Not just ChatGPT** — grounded in real, live trial data
-- **No hallucination** — every answer traced to actual documents  
-- **Domain-specific embeddings** — BiomedBERT trained on 
+- **Not just ChatGPT** -: grounded in real, live trial data
+- **No hallucination** -: every answer traced to actual documents  
+- **Domain-specific embeddings** -: BiomedBERT trained on 
   21M PubMed abstracts understands medical terminology deeply
-- **Live data** — automated daily updates via GitHub Actions
-- **100% free** — zero API costs, open source stack throughout
+- **Live data** -: automated daily updates via GitHub Actions
+- **100% free** -: zero API costs, open source stack throughout
 
 ## Architecture
 Patient Query (plain English)
