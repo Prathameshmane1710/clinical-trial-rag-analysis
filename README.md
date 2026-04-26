@@ -4,7 +4,7 @@ A semantic RAG (Retrieval-Augmented Generation) system
 that matches patients to relevant clinical trials using 
 AI-powered natural language understanding.
 
-## 🎯 Problem Statement
+## Problem Statement
 
 Finding the right clinical trial today requires manually 
 reading thousands of dense medical documents. Existing 
@@ -12,7 +12,7 @@ search on ClinicalTrials.gov uses basic keyword matching
 that misses semantic connections. This system solves that 
 by understanding medical meaning, not just keywords.
 
-## ✨ What Makes It Unique
+## What Makes It Unique
 
 - **Not just ChatGPT** — grounded in real, live trial data
 - **No hallucination** — every answer traced to actual documents  
@@ -21,7 +21,7 @@ by understanding medical meaning, not just keywords.
 - **Live data** — automated daily updates via GitHub Actions
 - **100% free** — zero API costs, open source stack throughout
 
-## 🏗️ Architecture
+## Architecture
 Patient Query (plain English)
 →
 LLM Query Validation (Llama 3.1 8B)
@@ -54,7 +54,7 @@ Structured Match Analysis
 | Updates | GitHub Actions | Free automated scheduling |
 | Data | ClinicalTrials.gov API | Free US government data |
 
-## 📊 Dataset
+## Dataset
 
 - **Source:** ClinicalTrials.gov (US National Library of Medicine)
 - **Current size:** 10,000+ trials (actively growing via daily updates)
@@ -62,7 +62,7 @@ Structured Match Analysis
 - **Update frequency:** Daily at 2 AM UTC via GitHub Actions
 - **Status filter:** Recruiting trials only
 
-## 🚀 How To Run Locally
+## How To Run Locally
 
 ### Prerequisites
 - Python 3.11+
